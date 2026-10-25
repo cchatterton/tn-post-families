@@ -27,8 +27,7 @@ function tnpf_editable_relatives($parent_id, $post_type, $exclude_id = 0) {
         'post_type'      => $post_type,
         'post_status'    => array('publish', 'future', 'draft', 'pending', 'private'),
         'posts_per_page' => -1,
-        'orderby'        => 'title',
-        'order'          => 'ASC',
+        'orderby'        => array('menu_order' => 'ASC', 'title' => 'ASC'),
     ));
 
     return array_values(array_filter($posts, static function ($relative) use ($exclude_id) {

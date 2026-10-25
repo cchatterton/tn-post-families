@@ -2,7 +2,7 @@
 /**
  * Plugin Name: TN Post Families
  * Description: Navigate parent, child and sibling posts in the WordPress editor.
- * Version: 1.0.0
+ * Version: 1.0.1
  * Requires at least: 7.0
  * Requires PHP: 7.4
  * Update URI: https://github.com/cchatterton/tn-post-families
@@ -18,7 +18,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('TNPF_VERSION', '1.0.0');
+define('TNPF_VERSION', '1.0.1');
 define('TNPF_PLUGIN_FILE', __FILE__);
 define('TNPF_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('TNPF_PLUGIN_URL', plugin_dir_url(__FILE__));

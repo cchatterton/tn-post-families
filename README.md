@@ -2,7 +2,7 @@
 
 TN Post Families adds a **Post family** navigation box to the WordPress editor for hierarchical post types. It shows editable parents, children and siblings without changing post data.
 
-Version: 1.0.0  
+Version: 1.0.1  
 Author: Techn  
 Branding mode: Extension Branded (native WordPress editor UI)  
 Requirements: WordPress 7.0+, PHP 7.4+
