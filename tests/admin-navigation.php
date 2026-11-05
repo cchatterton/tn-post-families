@@ -18,13 +18,11 @@ function get_edit_post_link($id, $context) { return '/wp-admin/post.php?post=' .
 function get_the_title($post) { return $post->post_title; }
 function get_post($id) { return $GLOBALS['posts'][$id] ?? null; }
 function post_type_exists($type) { return isset($GLOBALS['post_types'][$type]); }
-function get_post_type_object($type) {
-    return post_type_exists($type) ? (object) array('name' => $type, 'labels' => (object) array('name' => $GLOBALS['post_types'][$type])) : null;
-}
 function get_posts($args) {
     $posts = array_values(array_filter($GLOBALS['posts'], static function ($post) use ($args) {
         return (!isset($args['post_parent']) || $post->post_parent === $args['post_parent'])
             && $post->post_type === $args['post_type']
+            && (!isset($args['name']) || $post->post_name === $args['name'])
             && in_array($post->post_status, $args['post_status'], true);
     }));
     check($args['orderby'] === array('menu_order' => 'ASC', 'title' => 'ASC'), 'Relationship query must request menu order');
@@ -80,25 +78,46 @@ $html = ob_get_clean();
 check(strpos($html, 'No parent, children or siblings to show.') !== false, 'Empty state missing');
 
 $GLOBALS['posts'][8] = record(8, 0, 'Book index', 'publish', 0, 'page', 'book');
+$GLOBALS['posts'][9] = record(9, 8, 'Page child', 'publish', 4);
 $GLOBALS['posts'][10] = record(10, 0, 'Later book', 'publish', 8, 'book');
 $GLOBALS['posts'][11] = record(11, 0, 'First book', 'publish', 1, 'book');
 $GLOBALS['posts'][12] = record(12, 11, 'Chapter', 'draft', 3, 'book');
 $GLOBALS['posts'][13] = record(13, 12, 'Section', 'publish', 2, 'book');
 $GLOBALS['posts'][14] = record(14, 11, 'Hidden chapter', 'publish', 1, 'book');
-$GLOBALS['editable'] = array(8 => true, 10 => true, 11 => true, 12 => true, 13 => true);
+$GLOBALS['posts'][15] = record(15, 0, 'Hidden book', 'publish', 0, 'book');
+$GLOBALS['posts'][16] = record(16, 0, 'Hidden book index', 'publish', 0, 'page', 'book');
+$GLOBALS['editable'] = array(8 => true, 9 => true, 10 => true, 11 => true, 12 => true, 13 => true);
 
 ob_start();
 tnpf_render_meta_box($GLOBALS['posts'][8]);
 $html = ob_get_clean();
-check(strpos($html, 'In Books') !== false, 'Matching post type heading missing');
-check(strpos($html, 'post=11') < strpos($html, 'post=10'), 'Top-level items ignore menu order');
-check(strpos($html, 'post=11') < strpos($html, 'post=12') && strpos($html, 'post=12') < strpos($html, 'post=13'), 'Children are not nested under their parent');
-check(strpos($html, 'Hidden chapter') === false, 'Uneditable post type item exposed');
+check(substr_count($html, '<h3>Children</h3>') === 1, 'Matching items need one Children section');
+check(strpos($html, 'In Books') === false && strpos($html, 'tnpf-tree') === false, 'Separate post type tree remains');
+check(strpos($html, 'post=11') < strpos($html, 'post=9') && strpos($html, 'post=9') < strpos($html, 'post=10'), 'Merged children ignore menu order');
+check(strpos($html, 'post=12') === false && strpos($html, 'post=13') === false, 'Post type descendants were listed');
+check(strpos($html, 'Hidden book') === false, 'Uneditable top-level item exposed');
+
+ob_start();
+tnpf_render_meta_box($GLOBALS['posts'][11]);
+$html = ob_get_clean();
+check(strpos($html, '<h3>Parent</h3>') !== false && strpos($html, 'post=8') !== false, 'Matching Page missing from top-level post type Parent');
+check(strpos($html, 'Hidden book index') === false, 'Uneditable matching Page exposed');
+
+ob_start();
+tnpf_render_meta_box($GLOBALS['posts'][12]);
+$html = ob_get_clean();
+check(strpos($html, 'post=11') !== false && strpos($html, 'post=8') === false, 'Nested item did not keep its real parent');
 
 $GLOBALS['posts'][8]->post_name = 'not-a-post-type';
 ob_start();
 tnpf_render_meta_box($GLOBALS['posts'][8]);
 $html = ob_get_clean();
-check(strpos($html, 'In Books') === false, 'Nonmatching slug listed a post type');
+check(strpos($html, 'post=10') === false && strpos($html, 'post=11') === false, 'Nonmatching slug listed a post type');
+check(strpos($html, 'post=9') !== false, 'Existing page child disappeared');
+
+ob_start();
+tnpf_render_meta_box($GLOBALS['posts'][11]);
+$html = ob_get_clean();
+check(strpos($html, 'post=8') === false, 'Page with nonmatching slug shown as Parent');
 
 echo "Editor navigation checks passed.\n";
