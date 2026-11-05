@@ -88,7 +88,7 @@ function tnpf_render_meta_box($post) {
                 ?: strcasecmp(get_the_title($left), get_the_title($right));
         });
     }
-    $siblings = $post->post_parent
+    $siblings = ($post->post_parent || 'page' !== $post->post_type)
         ? tnpf_editable_relatives($post->post_parent, $post->post_type, $post->ID)
         : array();
 

@@ -3,7 +3,7 @@ Contributors:
 Tags: hierarchical, navigation, editor, pages
 Requires at least: 7.0
 Requires PHP: 7.4
-Stable tag: 1.1.1
+Stable tag: 1.1.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -16,6 +16,8 @@ TN Post Families adds a Post family box to the WordPress editor for hierarchical
 When editing a Page whose slug matches a registered post type, the box adds that type's editable top-level items to the existing Children list. Items without edit access are omitted.
 
 When editing one of those top-level post type items, the matching Page appears in its Parent list. Nested items keep their actual post parent.
+
+Other editable top-level items of the same post type appear in Siblings, ordered by menu order.
 
 The plugin does not change post content or relationships. Feature operation does not require Techn Update Controller.
 
@@ -37,6 +39,9 @@ GitHub terms: https://docs.github.com/en/site-policy/github-terms/github-terms-o
 GitHub privacy: https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement
 
 == Changelog ==
+
+= 1.1.2 =
+* Show other top-level items of the same custom post type as siblings.
 
 = 1.1.1 =
 * Add only matching post type's top-level items to the existing Children list; remove the separate nested section.

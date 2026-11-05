@@ -86,7 +86,8 @@ $GLOBALS['posts'][13] = record(13, 12, 'Section', 'publish', 2, 'book');
 $GLOBALS['posts'][14] = record(14, 11, 'Hidden chapter', 'publish', 1, 'book');
 $GLOBALS['posts'][15] = record(15, 0, 'Hidden book', 'publish', 0, 'book');
 $GLOBALS['posts'][16] = record(16, 0, 'Hidden book index', 'publish', 0, 'page', 'book');
-$GLOBALS['editable'] = array(8 => true, 9 => true, 10 => true, 11 => true, 12 => true, 13 => true);
+$GLOBALS['posts'][17] = record(17, 0, 'Middle book', 'publish', 2, 'book');
+$GLOBALS['editable'] = array(8 => true, 9 => true, 10 => true, 11 => true, 12 => true, 13 => true, 17 => true);
 
 ob_start();
 tnpf_render_meta_box($GLOBALS['posts'][8]);
@@ -102,6 +103,12 @@ tnpf_render_meta_box($GLOBALS['posts'][11]);
 $html = ob_get_clean();
 check(strpos($html, '<h3>Parent</h3>') !== false && strpos($html, 'post=8') !== false, 'Matching Page missing from top-level post type Parent');
 check(strpos($html, 'Hidden book index') === false, 'Uneditable matching Page exposed');
+check(preg_match('/<h3>Siblings<\/h3><ul>(.*?)<\/ul>/s', $html, $sibling_section) === 1, 'Top-level Siblings section missing');
+check(strpos($sibling_section[1], 'post=17') !== false && strpos($sibling_section[1], 'post=10') !== false, 'Other top-level items missing from Siblings');
+check(strpos($sibling_section[1], 'post=17') < strpos($sibling_section[1], 'post=10'), 'Top-level siblings ignore menu order');
+check(strpos($sibling_section[1], 'post=11') === false, 'Current top-level item shown as its own sibling');
+check(strpos($sibling_section[1], 'post=8') === false, 'Page of another post type shown as a sibling');
+check(strpos($sibling_section[1], 'post=12') === false && strpos($sibling_section[1], 'Hidden book') === false, 'Nested or uneditable item shown as a top-level sibling');
 
 ob_start();
 tnpf_render_meta_box($GLOBALS['posts'][12]);

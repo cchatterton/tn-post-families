@@ -2,6 +2,10 @@
 
 All notable changes to TN Post Families are recorded here.
 
+## 1.1.2 - 2026-11-05
+
+- Show other top-level items of the same custom post type as siblings, ordered by menu order and title.
+
 ## 1.1.1 - 2026-11-05
 
 - Add only the matching post type's top-level items to the existing Children list.
