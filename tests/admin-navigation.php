@@ -4,6 +4,7 @@ define('ABSPATH', __DIR__);
 $GLOBALS['posts'] = array();
 $GLOBALS['editable'] = array();
 $GLOBALS['hooks'] = array();
+$GLOBALS['post_types'] = array('book' => 'Books');
 
 function add_action($hook, $callback) { $GLOBALS['hooks'][$hook] = $callback; }
 function is_post_type_hierarchical($type) { return 'page' === $type; }
@@ -16,9 +17,13 @@ function current_user_can($cap, $id) { return !empty($GLOBALS['editable'][$id]);
 function get_edit_post_link($id, $context) { return '/wp-admin/post.php?post=' . $id . '&action=edit'; }
 function get_the_title($post) { return $post->post_title; }
 function get_post($id) { return $GLOBALS['posts'][$id] ?? null; }
+function post_type_exists($type) { return isset($GLOBALS['post_types'][$type]); }
+function get_post_type_object($type) {
+    return post_type_exists($type) ? (object) array('name' => $type, 'labels' => (object) array('name' => $GLOBALS['post_types'][$type])) : null;
+}
 function get_posts($args) {
     $posts = array_values(array_filter($GLOBALS['posts'], static function ($post) use ($args) {
-        return $post->post_parent === $args['post_parent']
+        return (!isset($args['post_parent']) || $post->post_parent === $args['post_parent'])
             && $post->post_type === $args['post_type']
             && in_array($post->post_status, $args['post_status'], true);
     }));
@@ -34,8 +39,8 @@ function wp_enqueue_style(...$args) { $GLOBALS['style'] = $args; }
 
 require dirname(__DIR__) . '/tn-post-families/functions/admin.php';
 
-function record($id, $parent, $title, $status = 'publish', $menu_order = 0) {
-    return (object) array('ID' => $id, 'post_parent' => $parent, 'post_type' => 'page', 'post_title' => $title, 'post_status' => $status, 'menu_order' => $menu_order);
+function record($id, $parent, $title, $status = 'publish', $menu_order = 0, $type = 'page', $slug = '') {
+    return (object) array('ID' => $id, 'post_parent' => $parent, 'post_type' => $type, 'post_title' => $title, 'post_status' => $status, 'menu_order' => $menu_order, 'post_name' => $slug);
 }
 function check($condition, $message) {
     if (!$condition) { throw new RuntimeException($message); }
@@ -73,5 +78,27 @@ ob_start();
 tnpf_render_meta_box($GLOBALS['posts'][2]);
 $html = ob_get_clean();
 check(strpos($html, 'No parent, children or siblings to show.') !== false, 'Empty state missing');
+
+$GLOBALS['posts'][8] = record(8, 0, 'Book index', 'publish', 0, 'page', 'book');
+$GLOBALS['posts'][10] = record(10, 0, 'Later book', 'publish', 8, 'book');
+$GLOBALS['posts'][11] = record(11, 0, 'First book', 'publish', 1, 'book');
+$GLOBALS['posts'][12] = record(12, 11, 'Chapter', 'draft', 3, 'book');
+$GLOBALS['posts'][13] = record(13, 12, 'Section', 'publish', 2, 'book');
+$GLOBALS['posts'][14] = record(14, 11, 'Hidden chapter', 'publish', 1, 'book');
+$GLOBALS['editable'] = array(8 => true, 10 => true, 11 => true, 12 => true, 13 => true);
+
+ob_start();
+tnpf_render_meta_box($GLOBALS['posts'][8]);
+$html = ob_get_clean();
+check(strpos($html, 'In Books') !== false, 'Matching post type heading missing');
+check(strpos($html, 'post=11') < strpos($html, 'post=10'), 'Top-level items ignore menu order');
+check(strpos($html, 'post=11') < strpos($html, 'post=12') && strpos($html, 'post=12') < strpos($html, 'post=13'), 'Children are not nested under their parent');
+check(strpos($html, 'Hidden chapter') === false, 'Uneditable post type item exposed');
+
+$GLOBALS['posts'][8]->post_name = 'not-a-post-type';
+ob_start();
+tnpf_render_meta_box($GLOBALS['posts'][8]);
+$html = ob_get_clean();
+check(strpos($html, 'In Books') === false, 'Nonmatching slug listed a post type');
 
 echo "Editor navigation checks passed.\n";

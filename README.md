@@ -2,10 +2,10 @@
 
 TN Post Families adds a **Post family** navigation box to the WordPress editor for hierarchical post types. It shows editable parents, children and siblings without changing post data.
 
-Version: 1.0.1  
-Author: Techn  
-Branding mode: Extension Branded (native WordPress editor UI)  
-Requirements: WordPress 7.0+, PHP 7.4+
+- Version: 1.1.0
+- Author: Techn
+- Branding mode: Extension Branded (native WordPress editor UI)
+- Requirements: WordPress 7.0+, PHP 7.4+
 
 ## Install
 
@@ -20,5 +20,7 @@ Techn Update Controller is optional for feature operation. Its [official release
 `tn-post-families/` contains the distributable plugin. `scripts/build-plugin-zip.sh` creates `dist/tn-post-families.zip` and the matching root ZIP. The controller helper is copied from `tn-update-controller/integration/controller-client.php` at the published v1 contract.
 
 The editor links use WordPress capabilities and edit URLs, and include published, scheduled, draft, pending and private posts. Trashed and automatic drafts are excluded. There are no stored settings or uninstall tasks.
+
+When a WordPress Page slug matches a registered post type name, the box also shows that type's editable top-level items and all their editable descendants as a nested tree. Each level follows `menu_order`, then title. The regular family sections remain available.
 
 The project follows the [Codex standards](https://github.com/cchatterton/codex-standards): general development, WordPress plugin, GitHub update, and branding/UX standards.
