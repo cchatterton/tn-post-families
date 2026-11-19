@@ -2,6 +2,11 @@
 
 All notable changes to TN Post Families are recorded here.
 
+## 1.1.4 - 2026-11-20
+
+- Limit the widget to hierarchical post types WordPress considers viewable on the front end.
+- Exclude editor-only post types from Page slug matches and related assets.
+
 ## 1.1.3 - 2026-11-19
 
 - Place Post family first among side meta boxes, even when a user has a saved meta box order.

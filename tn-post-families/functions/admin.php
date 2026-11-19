@@ -6,7 +6,7 @@ if (!defined('ABSPATH')) {
 }
 
 function tnpf_register_meta_box($post_type) {
-    if (!is_post_type_hierarchical($post_type)) {
+    if (!is_post_type_hierarchical($post_type) || !is_post_type_viewable($post_type)) {
         return;
     }
 
@@ -43,6 +43,10 @@ function tnpf_keep_meta_box_first($order) {
 }
 
 function tnpf_editable_relatives($parent_id, $post_type, $exclude_id = 0) {
+    if (!is_post_type_viewable($post_type)) {
+        return array();
+    }
+
     $posts = get_posts(array(
         'post_parent'    => $parent_id,
         'post_type'      => $post_type,
@@ -80,7 +84,7 @@ function tnpf_render_list($label, $posts) {
 }
 
 function tnpf_render_meta_box($post) {
-    if (!$post || !current_user_can('edit_post', $post->ID)) {
+    if (!$post || !is_post_type_viewable($post->post_type) || !current_user_can('edit_post', $post->ID)) {
         return;
     }
 
@@ -102,7 +106,7 @@ function tnpf_render_meta_box($post) {
     }
 
     $children = $post->ID ? tnpf_editable_relatives($post->ID, $post->post_type) : array();
-    if ('page' === $post->post_type && $post->post_name && post_type_exists($post->post_name)) {
+    if ('page' === $post->post_type && $post->post_name && is_post_type_viewable($post->post_name)) {
         $children = array_merge($children, tnpf_editable_relatives(0, $post->post_name));
         usort($children, static function ($left, $right) {
             return ($left->menu_order <=> $right->menu_order)
@@ -129,7 +133,7 @@ function tnpf_enqueue_admin_styles($hook) {
     }
 
     $screen = get_current_screen();
-    if (!$screen || !is_post_type_hierarchical($screen->post_type)) {
+    if (!$screen || !is_post_type_hierarchical($screen->post_type) || !is_post_type_viewable($screen->post_type)) {
         return;
     }
 

@@ -3,7 +3,7 @@ Contributors:
 Tags: hierarchical, navigation, editor, pages
 Requires at least: 7.0
 Requires PHP: 7.4
-Stable tag: 1.1.3
+Stable tag: 1.1.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -11,7 +11,7 @@ Navigate parent, child and sibling posts from the editor sidebar for hierarchica
 
 == Description ==
 
-TN Post Families adds a Post family box to the WordPress editor for hierarchical post types. It links to editable parent, child and sibling posts. Posts without an available relationship show a clear empty state.
+TN Post Families adds a Post family box to the WordPress editor for hierarchical post types that are viewable on the front end. It links to editable parent, child and sibling posts. Posts without an available relationship show a clear empty state.
 
 When editing a Page whose slug matches a registered post type, the box adds that type's editable top-level items to the existing Children list. Items without edit access are omitted.
 
@@ -39,6 +39,9 @@ GitHub terms: https://docs.github.com/en/site-policy/github-terms/github-terms-o
 GitHub privacy: https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement
 
 == Changelog ==
+
+= 1.1.4 =
+* Show the widget only for front-end-viewable hierarchical post types and exclude non-viewable slug matches.
 
 = 1.1.3 =
 * Prioritise Post family at the top of the editor's side meta boxes, including saved layouts.

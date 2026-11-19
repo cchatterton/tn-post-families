@@ -1,14 +1,21 @@
 <?php
 /* Lightweight WordPress API fixture for editor navigation behavior. */
 define('ABSPATH', __DIR__);
+define('TNPF_PLUGIN_URL', '/plugin/');
+define('TNPF_VERSION', 'test');
 $GLOBALS['posts'] = array();
 $GLOBALS['editable'] = array();
 $GLOBALS['hooks'] = array();
-$GLOBALS['post_types'] = array('book' => 'Books');
+$GLOBALS['post_types'] = array(
+    'page' => array('hierarchical' => true, 'viewable' => true),
+    'book' => array('hierarchical' => true, 'viewable' => true),
+    'internal' => array('hierarchical' => true, 'viewable' => false),
+);
 
 function add_action($hook, $callback, $priority = 10) { $GLOBALS['hooks'][$hook] = array($callback, $priority); }
 function add_filter($hook, $callback) { $GLOBALS['filters'][$hook] = $callback; }
-function is_post_type_hierarchical($type) { return 'page' === $type; }
+function is_post_type_hierarchical($type) { return !empty($GLOBALS['post_types'][$type]['hierarchical']); }
+function is_post_type_viewable($type) { return !empty($GLOBALS['post_types'][$type]['viewable']); }
 function add_meta_box(...$args) { $GLOBALS['box'] = $args; }
 function __($text, $domain) { return $text; }
 function esc_html__($text, $domain) { return htmlspecialchars($text, ENT_QUOTES); }
@@ -33,7 +40,7 @@ function get_posts($args) {
     });
     return $posts;
 }
-function get_current_screen() { return (object) array('post_type' => 'page'); }
+function get_current_screen() { return (object) array('post_type' => $GLOBALS['screen_post_type'] ?? 'page'); }
 function wp_enqueue_style(...$args) { $GLOBALS['style'] = $args; }
 
 require dirname(__DIR__) . '/tn-post-families/functions/admin.php';
@@ -58,6 +65,8 @@ $GLOBALS['editable'] = array(1 => true, 2 => true, 3 => true, 4 => true, 6 => tr
 
 tnpf_register_meta_box('post');
 check(!isset($GLOBALS['box']), 'Non-hierarchical post type received a box');
+tnpf_register_meta_box('internal');
+check(!isset($GLOBALS['box']), 'Non-viewable post type received a box');
 tnpf_register_meta_box('page');
 check($GLOBALS['box'][0] === 'tnpf_family', 'Hierarchical box missing');
 check($GLOBALS['box'][5] === 'high', 'Family box is not high priority');
@@ -65,6 +74,12 @@ check($GLOBALS['hooks']['add_meta_boxes'][1] === 1, 'Family box is not registere
 check($GLOBALS['filters']['get_user_option_meta-box-order_page'] === 'tnpf_keep_meta_box_first', 'Saved box order is not handled');
 check(tnpf_keep_meta_box_first(array('side' => 'other,tnpf_family,last', 'normal' => 'tnpf_family,another')) === array('side' => 'other,last', 'normal' => 'another'), 'Saved order still moves the family box');
 check(tnpf_keep_meta_box_first(false) === false, 'Missing saved order changed');
+$GLOBALS['screen_post_type'] = 'internal';
+tnpf_enqueue_admin_styles('post.php');
+check(!isset($GLOBALS['style']), 'Non-viewable post type loaded widget styles');
+$GLOBALS['screen_post_type'] = 'page';
+tnpf_enqueue_admin_styles('post.php');
+check($GLOBALS['style'][0] === 'tnpf-admin', 'Viewable post type did not load widget styles');
 
 ob_start();
 tnpf_render_meta_box($GLOBALS['posts'][2]);
@@ -132,5 +147,17 @@ ob_start();
 tnpf_render_meta_box($GLOBALS['posts'][11]);
 $html = ob_get_clean();
 check(strpos($html, 'post=8') === false, 'Page with nonmatching slug shown as Parent');
+
+$GLOBALS['posts'][19] = record(19, 0, 'Internal index', 'publish', 0, 'page', 'internal');
+$GLOBALS['posts'][20] = record(20, 0, 'Internal item', 'publish', 0, 'internal');
+$GLOBALS['editable'][19] = true;
+$GLOBALS['editable'][20] = true;
+ob_start();
+tnpf_render_meta_box($GLOBALS['posts'][19]);
+$html = ob_get_clean();
+check(strpos($html, 'post=20') === false, 'Non-viewable post type added to Page children');
+ob_start();
+tnpf_render_meta_box($GLOBALS['posts'][20]);
+check(ob_get_clean() === '', 'Non-viewable post type rendered the widget');
 
 echo "Editor navigation checks passed.\n";

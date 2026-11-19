@@ -1,8 +1,8 @@
 # TN Post Families
 
-TN Post Families adds a **Post family** navigation box to the WordPress editor for hierarchical post types. It shows editable parents, children and siblings without changing post data.
+TN Post Families adds a **Post family** navigation box to the WordPress editor for hierarchical post types that WordPress considers viewable on the front end. It shows editable parents, children and siblings without changing post data.
 
-- Version: 1.1.3
+- Version: 1.1.4
 - Author: Techn
 - Branding mode: Extension Branded (native WordPress editor UI)
 - Requirements: WordPress 7.0+, PHP 7.4+
@@ -21,7 +21,7 @@ Techn Update Controller is optional for feature operation. Its [official release
 
 The editor links use WordPress capabilities and edit URLs, and include published, scheduled, draft, pending and private posts. Trashed and automatic drafts are excluded. There are no stored settings or uninstall tasks.
 
-When a WordPress Page slug matches a registered post type name, the box adds that type's editable top-level items to the existing Children list. The merged list follows `menu_order`, then title. Descendants of those post type items are not listed there.
+When a WordPress Page slug matches a front-end-viewable post type name, the box adds that type's editable top-level items to the existing Children list. The merged list follows `menu_order`, then title. Descendants of those post type items are not listed there.
 
 For a top-level item of that post type, the matching Page appears in its Parent list. Nested items continue to show their actual post parent.
 
