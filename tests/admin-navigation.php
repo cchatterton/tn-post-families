@@ -6,7 +6,8 @@ $GLOBALS['editable'] = array();
 $GLOBALS['hooks'] = array();
 $GLOBALS['post_types'] = array('book' => 'Books');
 
-function add_action($hook, $callback) { $GLOBALS['hooks'][$hook] = $callback; }
+function add_action($hook, $callback, $priority = 10) { $GLOBALS['hooks'][$hook] = array($callback, $priority); }
+function add_filter($hook, $callback) { $GLOBALS['filters'][$hook] = $callback; }
 function is_post_type_hierarchical($type) { return 'page' === $type; }
 function add_meta_box(...$args) { $GLOBALS['box'] = $args; }
 function __($text, $domain) { return $text; }
@@ -59,6 +60,11 @@ tnpf_register_meta_box('post');
 check(!isset($GLOBALS['box']), 'Non-hierarchical post type received a box');
 tnpf_register_meta_box('page');
 check($GLOBALS['box'][0] === 'tnpf_family', 'Hierarchical box missing');
+check($GLOBALS['box'][5] === 'high', 'Family box is not high priority');
+check($GLOBALS['hooks']['add_meta_boxes'][1] === 1, 'Family box is not registered early');
+check($GLOBALS['filters']['get_user_option_meta-box-order_page'] === 'tnpf_keep_meta_box_first', 'Saved box order is not handled');
+check(tnpf_keep_meta_box_first(array('side' => 'other,tnpf_family,last', 'normal' => 'tnpf_family,another')) === array('side' => 'other,last', 'normal' => 'another'), 'Saved order still moves the family box');
+check(tnpf_keep_meta_box_first(false) === false, 'Missing saved order changed');
 
 ob_start();
 tnpf_render_meta_box($GLOBALS['posts'][2]);

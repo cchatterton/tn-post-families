@@ -2,7 +2,7 @@
 
 TN Post Families adds a **Post family** navigation box to the WordPress editor for hierarchical post types. It shows editable parents, children and siblings without changing post data.
 
-- Version: 1.1.2
+- Version: 1.1.3
 - Author: Techn
 - Branding mode: Extension Branded (native WordPress editor UI)
 - Requirements: WordPress 7.0+, PHP 7.4+
@@ -26,5 +26,7 @@ When a WordPress Page slug matches a registered post type name, the box adds tha
 For a top-level item of that post type, the matching Page appears in its Parent list. Nested items continue to show their actual post parent.
 
 Other editable top-level items of the same post type appear under Siblings in `menu_order`, then title order. The current item and nested items are excluded.
+
+The Post family box is registered at high priority and kept ahead of saved side meta box order. WordPress controls the placement of its native block editor panels separately, so exact adjacency to the main document panel depends on the editor layout.
 
 The project follows the [Codex standards](https://github.com/cchatterton/codex-standards): general development, WordPress plugin, GitHub update, and branding/UX standards.

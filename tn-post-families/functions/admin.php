@@ -16,10 +16,31 @@ function tnpf_register_meta_box($post_type) {
         'tnpf_render_meta_box',
         $post_type,
         'side',
-        'default'
+        'high'
     );
+
+    add_filter('get_user_option_meta-box-order_' . $post_type, 'tnpf_keep_meta_box_first');
 }
-add_action('add_meta_boxes', 'tnpf_register_meta_box');
+add_action('add_meta_boxes', 'tnpf_register_meta_box', 1);
+
+function tnpf_keep_meta_box_first($order) {
+    if (!is_array($order)) {
+        return $order;
+    }
+
+    foreach ($order as $context => $ids) {
+        if (!is_string($ids)) {
+            continue;
+        }
+
+        $box_ids = array_filter(explode(',', $ids), static function ($id) {
+            return 'tnpf_family' !== $id;
+        });
+        $order[$context] = implode(',', $box_ids);
+    }
+
+    return $order;
+}
 
 function tnpf_editable_relatives($parent_id, $post_type, $exclude_id = 0) {
     $posts = get_posts(array(

@@ -3,7 +3,7 @@ Contributors:
 Tags: hierarchical, navigation, editor, pages
 Requires at least: 7.0
 Requires PHP: 7.4
-Stable tag: 1.1.2
+Stable tag: 1.1.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -39,6 +39,9 @@ GitHub terms: https://docs.github.com/en/site-policy/github-terms/github-terms-o
 GitHub privacy: https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement
 
 == Changelog ==
+
+= 1.1.3 =
+* Prioritise Post family at the top of the editor's side meta boxes, including saved layouts.
 
 = 1.1.2 =
 * Show other top-level items of the same custom post type as siblings.
